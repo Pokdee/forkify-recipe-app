@@ -1,17 +1,8 @@
-const timeout = function (s) {
-  return new Promise(function (_, reject) {
-    setTimeout(function () {
-      reject(new Error(`Request took too long! Timeout after ${s} second`));
-    }, s * 1000);
-  });
-};
-
 // https://forkify-api.herokuapp.com/v2
 // #5ed6604591c37cdc054bcd09
 ///////////////////////////////////////
 import * as model from './model.js';
 import viewControll from './view.js';
-import { fraction } from './../../node_modules/fractional';
 const showRecipe = async function () {
   try {
     const id = window.location.hash;
@@ -22,7 +13,7 @@ const showRecipe = async function () {
     viewControll.render(recipe);
     // console.log(recipe);
   } catch (err) {
-    alert(err);
+    alert(err.message);
   }
 };
 ['load', 'hashchange'].forEach(ev => window.addEventListener(ev, showRecipe));
