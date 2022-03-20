@@ -13,7 +13,11 @@ const showRecipe = async function () {
     viewControll.render(recipe);
     // console.log(recipe);
   } catch (err) {
-    alert(err.message);
+    viewControll.renderError(err.message);
   }
 };
-['load', 'hashchange'].forEach(ev => window.addEventListener(ev, showRecipe));
+//subscriber
+const init = function () {
+  viewControll.addHandlerRender(showRecipe);
+};
+init();

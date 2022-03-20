@@ -9,6 +9,26 @@ class ViewControll {
     this.#renderPreview(this.#data);
   }
 
+  renderError(message) {
+    const html = `
+    <div class="error">
+            <div>
+              <svg>
+                <use href="src/img/icons.svg#icon-alert-triangle"></use>
+              </svg>
+            </div>
+        <p>${message}!</p>
+    </div> 
+    `;
+    this.#cleaner(this.#recipeContainer);
+    this.#recipeContainer.insertAdjacentHTML('afterbegin', html);
+  }
+
+  //publisher
+  addHandlerRender(handler) {
+    ['load', 'hashchange'].forEach(ev => window.addEventListener(ev, handler));
+  }
+
   spinner() {
     const html = `<div class="spinner">
     <svg>
