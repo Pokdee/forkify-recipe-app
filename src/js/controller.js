@@ -13,7 +13,8 @@ const showRecipe = async function () {
     viewControll.render(recipe);
     // console.log(recipe);
   } catch (err) {
-    viewControll.renderError(err.message);
+    console.log(err.message);
+    viewControll.renderError();
   }
 };
 //subscriber

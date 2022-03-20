@@ -1,6 +1,7 @@
 class ViewControll {
   #previewContainer = document.querySelector('.results');
   #recipeContainer = document.querySelector('.recipe');
+  #errorMessage = "Sorry we couldn't find this one.Please try another one";
   #data = {};
 
   render(obj) {
@@ -9,7 +10,7 @@ class ViewControll {
     this.#renderPreview(this.#data);
   }
 
-  renderError(message) {
+  renderError(message = this.#errorMessage) {
     const html = `
     <div class="error">
             <div>
@@ -17,10 +18,11 @@ class ViewControll {
                 <use href="src/img/icons.svg#icon-alert-triangle"></use>
               </svg>
             </div>
-        <p>${message}!</p>
+        <p>${message} !</p>
     </div> 
     `;
     this.#cleaner(this.#recipeContainer);
+    this.#cleaner(this.#previewContainer);
     this.#recipeContainer.insertAdjacentHTML('afterbegin', html);
   }
 
@@ -63,7 +65,28 @@ class ViewControll {
       </li>
         `;
     this.#cleaner(this.#previewContainer);
-    this.#previewContainer.insertAdjacentHTML('afterend', html);
+    this.#previewContainer.insertAdjacentHTML('beforeend', html);
+  }
+  #renderIngredients(obj) {
+    const html = obj.ingredients
+      .map(int => {
+        return `
+      <li class="recipe__ingredient">
+      <svg class="recipe__icon">
+        <use href="src/img/icons.svg#icon-check"></use>
+      </svg>
+      <div class="recipe__quantity">${
+        typeof int.quantity === 'number' ? int.quantity : ''
+      }</div>
+      <div class="recipe__description">
+        <span class="recipe__unit">${int.unit}</span>
+        ${int.description}
+      </div>
+      </li>
+      `;
+      })
+      .join('');
+    return html;
   }
   #renderRecipe(obj) {
     const html = `
@@ -123,25 +146,7 @@ class ViewControll {
         <div class="recipe__ingredients">
           <h2 class="heading--2">Recipe ingredients</h2>
           <ul class="recipe__ingredient-list">
-      
-          ${obj.ingredients
-            .map(int => {
-              return `
-            <li class="recipe__ingredient">
-            <svg class="recipe__icon">
-              <use href="src/img/icons.svg#icon-check"></use>
-            </svg>
-            <div class="recipe__quantity">${
-              typeof int.quantity === 'number' ? int.quantity : ''
-            }</div>
-            <div class="recipe__description">
-              <span class="recipe__unit">${int.unit}</span>
-              ${int.description}
-            </div>
-            </li>
-            `;
-            })
-            .join('')}   
+          ${this.#renderIngredients(obj)} 
           </ul>
         </div>
       
