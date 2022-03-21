@@ -1,13 +1,14 @@
 class ViewControll {
   #previewContainer = document.querySelector('.results');
   #recipeContainer = document.querySelector('.recipe');
+
   #errorMessage = "Sorry we couldn't find this one.Please try another one";
+  #successMessage = 'Click the recipe you want to view';
   #data = {};
 
   render(obj) {
     this.#data = obj;
     this.#renderRecipe(this.#data);
-    this.#renderPreview(this.#data);
   }
 
   renderError(message = this.#errorMessage) {
@@ -23,6 +24,20 @@ class ViewControll {
     `;
     this.#cleaner(this.#recipeContainer);
     this.#cleaner(this.#previewContainer);
+    this.#recipeContainer.insertAdjacentHTML('afterbegin', html);
+  }
+  renderSuccess(message = this.#successMessage) {
+    const html = `
+    <div class="error">
+    <div>
+      <svg>
+        <use href="src/img/icons.svg#icon-smile"></use>
+      </svg>
+    </div>
+<p>${message}😍</p>
+</div> 
+    `;
+    this.#cleaner(this.#recipeContainer);
     this.#recipeContainer.insertAdjacentHTML('afterbegin', html);
   }
 
@@ -43,14 +58,18 @@ class ViewControll {
   #cleaner(loca) {
     loca.innerHTML = '';
   }
+  cleanAll() {
+    this.#previewContainer.innerHTML = '';
+    this.#recipeContainer.innerHTML = '';
+  }
 
-  #renderPreview(obj) {
+  renderPreview(obj) {
     const html = `
         
         <li class="preview">
-        <a class="preview__link preview__link--active" href="#23456">
+        <a class="preview__link preview__link--active" href="#${obj.recipe_id}">
           <figure class="preview__fig">
-            <img src="${obj.Image}" alt="${obj.title}" />
+            <img src="${obj.image_url}" alt="${obj.title}" />
           </figure>
           <div class="preview__data">
             <h4 class="preview__title">${obj.title}...</h4>
@@ -64,7 +83,7 @@ class ViewControll {
         </a>
       </li>
         `;
-    this.#cleaner(this.#previewContainer);
+    // this.#cleaner(this.#previewContainer);
     this.#previewContainer.insertAdjacentHTML('beforeend', html);
   }
   #renderIngredients(obj) {

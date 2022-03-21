@@ -1,7 +1,10 @@
 import { API_URL } from './config.js';
+import { API_NS } from './config.js';
 import { fetcher } from './helper.js';
+
 export const state = {
   recipe: {},
+  recipesArray: [],
 };
 export const Loadrecipe = async function (id) {
   try {
@@ -19,5 +22,15 @@ export const Loadrecipe = async function (id) {
     };
   } catch (error) {
     throw new Error(error.message);
+  }
+};
+
+export const loadSearchResult = async function (food) {
+  try {
+    const req = await fetch(`${API_NS}=${food}`);
+    const data = await req.json();
+    state.recipesArray = data.recipes;
+  } catch (error) {
+    throw error;
   }
 };
