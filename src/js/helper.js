@@ -15,7 +15,7 @@ export const fetcher = async function (url) {
   const data = await Promise.race([req.json(), timeout(TIME)]);
 
   if (!req.ok) {
-    throw new Error(`Not found (status : ${data.status})`);
+    throw new Error(`Error from helper`);
   }
   return data;
 };

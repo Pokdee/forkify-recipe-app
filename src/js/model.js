@@ -1,10 +1,13 @@
-import { API_URL } from './config.js';
+import { API_NIDS, API_URL } from './config.js';
 import { API_NS } from './config.js';
 import { fetcher } from './helper.js';
 
 export const state = {
   recipe: {},
-  recipesArray: [],
+  search: {
+    query: '',
+    results: [],
+  },
 };
 export const Loadrecipe = async function (id) {
   try {
@@ -27,9 +30,17 @@ export const Loadrecipe = async function (id) {
 
 export const loadSearchResult = async function (food) {
   try {
-    const req = await fetch(`${API_NS}=${food}`);
-    const data = await req.json();
-    state.recipesArray = data.recipes;
+    state.search.query = food;
+    const data = await fetcher(`${API_NS}${food}`);
+    let recipesArray = data.recipes;
+    state.search.results = recipesArray.map(rec => {
+      return {
+        Image: rec.image_url,
+        id: rec.recipe_id,
+        title: rec.title,
+        publisher: rec.publisher,
+      };
+    });
   } catch (error) {
     throw error;
   }

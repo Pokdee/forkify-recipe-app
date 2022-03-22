@@ -1,44 +1,44 @@
 // https://forkify-api.herokuapp.com/v2
-// #5ed6604591c37cdc054bcd09
 ///////////////////////////////////////
 import { API_NIDS } from './config.js';
 import * as model from './model.js';
-import viewControll from './view.js';
-import Searchview from './searchView.js';
-import view from './view.js';
-let recipesArray;
+import SearchView from './searchView.js';
+import ResultView from './resultView.js';
+import RecipeView from './recipeView.js';
+import View from './view.js';
+
 const showRecipe = async function () {
   try {
     const id = window.location.hash;
     if (!id) return;
-    viewControll.spinner();
+    ResultView.spinner();
 
     await model.Loadrecipe(id);
     console.log(model.state.recipe);
     const { recipe } = model.state;
-    viewControll.render(recipe);
+    ResultView.render(recipe);
   } catch (err) {
     console.log(err);
-    viewControll.renderError();
+    ResultView.renderError();
   }
 };
 ///////////////
+let resultArray;
 const loadRecipe = async function () {
   try {
-    viewControll.cleanAll();
-    viewControll.spinner();
-    const query = Searchview.getQuery();
+    ResultView._cleaner();
+    ResultView.spinner();
+    const query = SearchView.getQuery();
+
     if (!query) {
-      viewControll.renderError();
+      ResultView.renderError();
       return;
     }
     await model.loadSearchResult(query);
-    recipesArray = model.state.recipesArray;
-    viewControll.renderSuccess();
-    recipesArray.forEach(recipe => viewControll.renderPreview(recipe));
+    resultArray = model.state.search.results;
+    ResultView.render(resultArray);
   } catch (error) {
-    console.log(error.message);
-    viewControll.renderError();
+    ResultView.renderError();
   }
 };
 //////////////////
@@ -46,7 +46,7 @@ const loadRecipe = async function () {
 //subscriber
 
 const init = function () {
-  viewControll.addHandlerRender(showRecipe);
-  Searchview.addHandlerSearch(loadRecipe);
+  RecipeView.addHandlerRender(showRecipe);
+  SearchView.addHandlerSearch(loadRecipe);
 };
 init();
