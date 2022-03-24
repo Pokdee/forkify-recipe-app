@@ -23,10 +23,11 @@ const showRecipe = async function () {
   }
 };
 ///////////////
-let resultArray;
+let resultPageLen;
 const loadRecipe = async function () {
   try {
     ResultView._cleaner();
+    ResultView._pagination.innerHTML = '';
     ResultView.spinner();
     const query = SearchView.getQuery();
 
@@ -35,8 +36,11 @@ const loadRecipe = async function () {
       return;
     }
     await model.loadSearchResult(query);
-    resultArray = model.state.search.results;
-    ResultView.render(resultArray);
+    resultPageLen = Math.ceil(model.state.search.results.length / 10);
+    console.log(resultPageLen);
+    ResultView.render(model.sortResult());
+    ResultView.renderPagination(resultPageLen);
+    ResultView.renderPreNextPagi(4);
   } catch (error) {
     ResultView.renderError();
   }

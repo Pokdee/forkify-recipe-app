@@ -41,7 +41,15 @@ export const loadSearchResult = async function (food) {
         publisher: rec.publisher,
       };
     });
+    console.log(state.search.results.length);
   } catch (error) {
     throw error;
   }
+};
+
+let start = 0;
+let end = 10;
+
+export const sortResult = function () {
+  return state.search.results.slice(start, end);
 };
