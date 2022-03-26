@@ -7,6 +7,7 @@ export const state = {
   search: {
     query: '',
     results: [],
+    pageLen: '',
   },
 };
 export const Loadrecipe = async function (id) {
@@ -33,6 +34,7 @@ export const loadSearchResult = async function (food) {
     state.search.query = food;
     const data = await fetcher(`${API_NS}${food}`);
     let recipesArray = data.recipes;
+
     state.search.results = recipesArray.map(rec => {
       return {
         Image: rec.image_url,
@@ -41,15 +43,52 @@ export const loadSearchResult = async function (food) {
         publisher: rec.publisher,
       };
     });
-    console.log(state.search.results.length);
+    // console.log(`${recipesArray.length} items`);
+    state.search.pageLen = Math.ceil(recipesArray.length / 10);
   } catch (error) {
     throw error;
   }
 };
 
 let start = 0;
-let end = 10;
+let end = 1;
+let pageLen = state.search.pageLen;
 
 export const sortResult = function () {
-  return state.search.results.slice(start, end);
+  start = 0;
+  end = 1;
+
+  return state.search.results.slice(0, 10);
 };
+
+export const sortResultPrevNext = function (pageLen, key = true) {
+  if (start < 0 || end > pageLen + 1) return;
+  if (key) {
+    start++;
+    end++;
+    return state.search.results.slice(start * 10, end * 10);
+  } else {
+    start--;
+    end--;
+
+    return state.search.results.slice(start * 10, end * 10);
+  }
+};
+
+// export const sortResultNext = function (pageLen) {
+//   if (start < 0 || end > pageLen + 1) return;
+
+//   start++;
+//   end++;
+//   console.log('model next');
+//   return state.search.results.slice(start * 10, end * 10);
+// };
+
+// export const sortResultPrev = function (pageLen) {
+//   if (start < 0 || end > pageLen + 1) return;
+
+//   start--;
+//   end--;
+//   console.log('model prev');
+//   return state.search.results.slice(start * 10, end * 10);
+// };

@@ -30,27 +30,34 @@ const loadRecipe = async function () {
     ResultView._pagination.innerHTML = '';
     ResultView.spinner();
     const query = SearchView.getQuery();
-
+    SearchView._cleanInput();
     if (!query) {
       ResultView.renderError();
       return;
     }
     await model.loadSearchResult(query);
-    resultPageLen = Math.ceil(model.state.search.results.length / 10);
-    console.log(resultPageLen);
+
+    resultPageLen = model.state.search.pageLen;
+    // console.log(`Total ${resultPageLen} Pages`);
     ResultView.render(model.sortResult());
     ResultView.renderPagination(resultPageLen);
-    ResultView.renderPreNextPagi(4);
+    ResultView.renderPreNextPagi(LoadPrev, LoadNext, resultPageLen);
   } catch (error) {
     ResultView.renderError();
   }
 };
 //////////////////
-
+const LoadNext = function () {
+  ResultView.render(model.sortResultPrevNext(resultPageLen));
+};
+const LoadPrev = function () {
+  ResultView.render(model.sortResultPrevNext(resultPageLen, false));
+};
 //subscriber
 
 const init = function () {
   RecipeView.addHandlerRender(showRecipe);
   SearchView.addHandlerSearch(loadRecipe);
+  ResultView.addHandlerPagi(LoadPrev, LoadNext);
 };
 init();
