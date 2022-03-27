@@ -7,9 +7,13 @@ export default class View {
   render(data) {
     if (!data) return this.renderError;
     this._data = data;
-    const html = this._generateHtml(this._data);
-    this._cleaner(this._parentElement);
+    const html = this._generateHtml();
+    this._cleaner();
     this._parentElement.insertAdjacentHTML('beforeend', html);
+  }
+
+  _cleaner() {
+    this._parentElement.innerHTML = '';
   }
 
   renderError(message = this._errorMessage) {
@@ -49,9 +53,5 @@ export default class View {
     </svg>
   </div>`;
     this._parentElement.insertAdjacentHTML('afterbegin', html);
-  }
-
-  _cleaner() {
-    this._parentElement.innerHTML = '';
   }
 }

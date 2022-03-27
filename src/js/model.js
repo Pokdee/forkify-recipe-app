@@ -1,5 +1,4 @@
-import { API_NIDS, API_URL } from './config.js';
-import { API_NS } from './config.js';
+import { API_NIDS, API_URL, API_NS, RES_PER_PAGE } from './config.js';
 import { fetcher } from './helper.js';
 
 export const state = {
@@ -7,7 +6,7 @@ export const state = {
   search: {
     query: '',
     results: [],
-    pageLen: '',
+    page: 1,
   },
 };
 export const Loadrecipe = async function (id) {
@@ -43,52 +42,14 @@ export const loadSearchResult = async function (food) {
         publisher: rec.publisher,
       };
     });
-    // console.log(`${recipesArray.length} items`);
-    state.search.pageLen = Math.ceil(recipesArray.length / 10);
   } catch (error) {
     throw error;
   }
 };
 
-let start = 0;
-let end = 1;
-let pageLen = state.search.pageLen;
-
-export const sortResult = function () {
-  start = 0;
-  end = 1;
-
-  return state.search.results.slice(0, 10);
+export const sortResults = function (page = state.search.page) {
+  state.search.page = page;
+  const start = (page - 1) * RES_PER_PAGE;
+  const end = page * RES_PER_PAGE;
+  return state.search.results.slice(start, end);
 };
-
-export const sortResultPrevNext = function (pageLen, key = true) {
-  if (start < 0 || end > pageLen + 1) return;
-  if (key) {
-    start++;
-    end++;
-    return state.search.results.slice(start * 10, end * 10);
-  } else {
-    start--;
-    end--;
-
-    return state.search.results.slice(start * 10, end * 10);
-  }
-};
-
-// export const sortResultNext = function (pageLen) {
-//   if (start < 0 || end > pageLen + 1) return;
-
-//   start++;
-//   end++;
-//   console.log('model next');
-//   return state.search.results.slice(start * 10, end * 10);
-// };
-
-// export const sortResultPrev = function (pageLen) {
-//   if (start < 0 || end > pageLen + 1) return;
-
-//   start--;
-//   end--;
-//   console.log('model prev');
-//   return state.search.results.slice(start * 10, end * 10);
-// };
