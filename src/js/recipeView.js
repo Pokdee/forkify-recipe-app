@@ -1,66 +1,29 @@
 import View from './view.js';
 class RecipeView extends View {
-  _previewContainer = document.querySelector('.results');
+  // _previewContainer = document.querySelector('.results');
   _parentElement = document.querySelector('.recipe');
+  _recipeContainer = document.querySelector('.recipe__ingredient-list');
+  _btnContainer = document.querySelector('.recipe__info-buttons');
 
   _data = {};
 
-  cleanAll() {
-    this._previewContainer.innerHTML = '';
-    this._parentElement.innerHTML = '';
-  }
+  addHandlerServing(handler) {
+    let serving = 1;
 
+    this._parentElement.addEventListener('click', e => {
+      const btn = e.target.closest('.btn--tiny');
+      if (!btn) return;
+      const update = +btn.dataset.update;
+      handler(update);
+    });
+  }
   //publisher
   addHandlerRender(handler) {
     ['load', 'hashchange'].forEach(ev => window.addEventListener(ev, handler));
   }
 
-  renderPreview(obj) {
-    const html = `
-          
-          <li class="preview">
-          <a class="preview__link preview__link--active" href="_${obj.id}">
-            <figure class="preview__fig">
-              <img src="${obj.Image}" alt="${obj.title}" />
-            </figure>
-            <div class="preview__data">
-              <h4 class="preview__title">${obj.title}...</h4>
-              <p class="preview__publisher">${obj.publisher}</p>
-              <div class="preview__user-generated">
-                <svg>
-                  <use href="src/img/icons.svg#icon-user"></use>
-                </svg>
-              </div>
-            </div>
-          </a>
-        </li>
-          `;
-    this._previewContainer.insertAdjacentHTML('beforeend', html);
-  }
-  _renderIngredients(obj) {
-    const html = obj.ingredients
-      .map(int => {
-        return `
-        <li class="recipe__ingredient">
-        <svg class="recipe__icon">
-          <use href="src/img/icons.svg#icon-check"></use>
-        </svg>
-        <div class="recipe__quantity">${
-          typeof int.quantity === 'number' ? int.quantity : ''
-        }</div>
-        <div class="recipe__description">
-          <span class="recipe__unit">${int.unit}</span>
-          ${int.description}
-        </div>
-        </li>
-        `;
-      })
-      .join('');
-    return html;
-  }
-  _renderRecipe(obj) {
-    const html = `
-          
+  _generateHtml(obj = this._data) {
+    return `
           <figure class="recipe__fig">
             <img src="${obj.Image}" alt="${obj.title}" class="recipe__img" />
             <h1 class="recipe__title">
@@ -88,12 +51,12 @@ class RecipeView extends View {
               <span class="recipe__info-text">servings</span>
         
               <div class="recipe__info-buttons">
-                <button class="btn--tiny btn--increase-servings">
+                <button class="btn--tiny btn--decrease-servings" data-update = "-1">
                   <svg>
                     <use href="src/img/icons.svg#icon-minus-circle"></use>
                   </svg>
                 </button>
-                <button class="btn--tiny btn--increase-servings">
+                <button class="btn--tiny btn--increase-servings" data-update = "1">
                   <svg>
                     <use href="src/img/icons.svg#icon-plus-circle"></use>
                   </svg>
@@ -101,7 +64,7 @@ class RecipeView extends View {
               </div>
             </div>
         
-            <div class="recipe__user-generated">
+          <div class="recipe__user-generated">
 
             </div>
             <button class="btn--round">
@@ -140,8 +103,48 @@ class RecipeView extends View {
           </div>
           
           `;
-    this._cleaner(this._parentElement);
-    this._parentElement.insertAdjacentHTML('afterbegin', html);
+  }
+  _updateIngredients() {
+    const html = this._data
+      .map(int => {
+        return `
+        <li class="recipe__ingredient">
+        <svg class="recipe__icon">
+          <use href="src/img/icons.svg#icon-check"></use>
+        </svg>
+        <div class="recipe__quantity">${
+          typeof int.quantity === 'number' ? int.quantity : ''
+        }</div>
+        <div class="recipe__description">
+          <span class="recipe__unit">${int.unit}</span>
+          ${int.description}
+        </div>
+        </li>
+        `;
+      })
+      .join('');
+  }
+  _renderIngredients(obj) {
+    const html = obj.ingredients
+      .map(int => {
+        return `
+        <li class="recipe__ingredient">
+        <svg class="recipe__icon">
+          <use href="src/img/icons.svg#icon-check"></use>
+        </svg>
+        <div class="recipe__quantity">${
+          typeof int.quantity === 'number' ? int.quantity : ''
+        }</div>
+        <div class="recipe__description">
+          <span class="recipe__unit">${int.unit}</span>
+          ${int.description}
+        </div>
+        </li>
+        `;
+      })
+      .join('');
+
+    return html;
   }
 }
 

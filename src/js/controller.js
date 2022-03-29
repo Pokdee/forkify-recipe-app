@@ -1,27 +1,27 @@
 // https://forkify-api.herokuapp.com/v2
 ///////////////////////////////////////
-import { API_NIDS } from './config.js';
+
 import * as model from './model.js';
 import SearchView from './searchView.js';
 import ResultView from './resultView.js';
 import RecipeView from './recipeView.js';
 import paginationView from './paginationView.js';
-
 const showRecipe = async function () {
   try {
-    const id = window.location.hash;
+    const id = '#5ed6604591c37cdc054bc886'; //window.location.hash;
     if (!id) return;
-    ResultView.spinner();
+    RecipeView.spinner();
 
     await model.Loadrecipe(id);
-    console.log(model.state.recipe);
     const { recipe } = model.state;
-    ResultView.render(recipe);
+
+    RecipeView.render(recipe);
   } catch (err) {
     console.log(err);
-    ResultView.renderError();
+    RecipeView.renderError();
   }
 };
+
 ///////////////
 let resultPageLen;
 const loadRecipe = async function () {
@@ -59,10 +59,17 @@ const pagiController = function (page) {
 
   paginationView.render(model.state.search);
 };
-//subscriber
 
+const servingController = function (serving) {
+  const newServing = model.state.recipe.serving + serving;
+  model.updateServing(newServing);
+  RecipeView.render(model.state.recipe);
+};
+
+//subscriber
 const init = function () {
   RecipeView.addHandlerRender(showRecipe);
+  RecipeView.addHandlerServing(servingController);
   SearchView.addHandlerSearch(loadRecipe);
   paginationView.addHandlerPagi(pagiController);
 };

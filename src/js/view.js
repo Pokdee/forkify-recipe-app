@@ -1,5 +1,4 @@
 export default class View {
-  _pagination = document.querySelector('.pagination');
   _errorMessage = "Sorry we couldn't find this one.Please try another one";
   _successMessage = 'Click the recipe you want to view';
   _data;

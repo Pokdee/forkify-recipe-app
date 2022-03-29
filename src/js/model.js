@@ -1,4 +1,4 @@
-import { API_NIDS, API_URL, API_NS, RES_PER_PAGE } from './config.js';
+import { API_URL, API_URL_NS, RES_PER_PAGE } from './config.js';
 import { fetcher } from './helper.js';
 
 export const state = {
@@ -31,9 +31,8 @@ export const Loadrecipe = async function (id) {
 export const loadSearchResult = async function (food) {
   try {
     state.search.query = food;
-    const data = await fetcher(`${API_NS}${food}`);
-    let recipesArray = data.recipes;
-
+    const data = await fetcher(`${API_URL_NS}${food}`);
+    let recipesArray = data.data.recipes;
     state.search.results = recipesArray.map(rec => {
       return {
         Image: rec.image_url,
@@ -52,4 +51,13 @@ export const sortResults = function (page = state.search.page) {
   const start = (page - 1) * RES_PER_PAGE;
   const end = page * RES_PER_PAGE;
   return state.search.results.slice(start, end);
+};
+
+export const updateServing = function (newServing) {
+  if (newServing === 0) return;
+
+  state.recipe.ingredients.forEach(ing => {
+    ing.quantity = (ing.quantity * newServing) / state.recipe.serving; //ingQt * newSv/OldSv
+  });
+  state.recipe.serving = newServing;
 };
