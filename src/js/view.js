@@ -4,13 +4,30 @@ export default class View {
   _data;
 
   render(data) {
-    if (!data) return this.renderError;
+    if (!data || data.length === 0) return this.renderError;
     this._data = data;
     const html = this._generateHtml();
     this._cleaner();
     this._parentElement.insertAdjacentHTML('beforeend', html);
   }
 
+  update(data) {
+    if (!data || data.length === 0) return this.renderError;
+    this._data = data;
+    const html = this._generateHtml();
+    const newDom = document.createRange().createContextualFragment(html);
+    const newEl = newDom.querySelectorAll('*');
+    const oldEl = this._parentElement.querySelectorAll('*');
+    newEl.forEach((n, i) => {
+      const curNode = oldEl[i];
+      if (
+        !n.isEqualNode(curNode) &&
+        curNode.firstChild?.nodeValue.trim() !== ''
+      ) {
+        oldEl[i].textContent = newEl[i].textContent;
+      }
+    });
+  }
   _cleaner() {
     this._parentElement.innerHTML = '';
   }
@@ -51,6 +68,8 @@ export default class View {
       <use href="src/img/icons.svg#icon-loader"></use>
     </svg>
   </div>`;
+    this._cleaner();
+
     this._parentElement.insertAdjacentHTML('afterbegin', html);
   }
 }

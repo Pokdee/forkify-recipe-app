@@ -7,9 +7,16 @@ class RecipeView extends View {
 
   _data = {};
 
+  addHandlerRecipe(handler) {
+    this._parentElement.addEventListener('click', e => {
+      // e.preventDefault();
+      if (!e.target.closest('.preview')) return;
+      const parent = e.target.closest('.preview');
+      const id = parent.querySelector('.preview__link').getAttribute('href');
+      handler(id);
+    });
+  }
   addHandlerServing(handler) {
-    let serving = 1;
-
     this._parentElement.addEventListener('click', e => {
       const btn = e.target.closest('.btn--tiny');
       if (!btn) return;

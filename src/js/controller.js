@@ -5,10 +5,10 @@ import * as model from './model.js';
 import SearchView from './searchView.js';
 import ResultView from './resultView.js';
 import RecipeView from './recipeView.js';
-import paginationView from './paginationView.js';
+import PaginationView from './paginationView.js';
 const showRecipe = async function () {
   try {
-    const id = '#5ed6604591c37cdc054bc886'; //window.location.hash;
+    const id = window.location.hash; //'#5ed6604591c37cdc054bc886';
     if (!id) return;
     RecipeView.spinner();
 
@@ -27,9 +27,7 @@ let resultPageLen;
 const loadRecipe = async function () {
   try {
     //clean container
-    paginationView._cleaner();
-    ResultView._cleaner();
-    ResultView._pagination.innerHTML = '';
+
     ResultView.spinner();
     //get query
     const query = SearchView.getQuery();
@@ -42,14 +40,16 @@ const loadRecipe = async function () {
 
     //wait for results
     model.state.search.page = 1;
-    await model.loadSearchResult(query);
+    const data = await model.loadSearchResult(query);
 
     //render Result
     ResultView.render(model.sortResults());
 
     //render Pagination
-    paginationView.render(model.state.search);
+    PaginationView.render(model.state.search);
   } catch (error) {
+    console.log(error);
+
     ResultView.renderError();
   }
 };
@@ -57,20 +57,22 @@ const loadRecipe = async function () {
 const pagiController = function (page) {
   ResultView.render(model.sortResults(page));
 
-  paginationView.render(model.state.search);
+  PaginationView.render(model.state.search);
 };
 
 const servingController = function (serving) {
   const newServing = model.state.recipe.serving + serving;
   model.updateServing(newServing);
-  RecipeView.render(model.state.recipe);
+  RecipeView.update(model.state.recipe);
 };
 
 //subscriber
 const init = function () {
   RecipeView.addHandlerRender(showRecipe);
   RecipeView.addHandlerServing(servingController);
+  RecipeView.addHandlerRecipe(showRecipe);
+
   SearchView.addHandlerSearch(loadRecipe);
-  paginationView.addHandlerPagi(pagiController);
+  PaginationView.addHandlerPagi(pagiController);
 };
 init();

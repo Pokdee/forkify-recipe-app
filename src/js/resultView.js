@@ -5,12 +5,12 @@ class ResultView extends View {
   _previousBtn;
   _nextBtn;
 
-  _generateHtml(results = this._data) {
-    return results
+  _generateHtml() {
+    return this._data
       .map(recipe => {
         return `
               <li class="preview">
-              <a class="preview__link preview__link--active" href="_${recipe.id}">
+              <a class="preview__link preview__link--active" href="#${recipe.id}">
                 <figure class="preview__fig">
                   <img src="${recipe.Image}" alt="${recipe.title}" />
                 </figure>

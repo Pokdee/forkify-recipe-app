@@ -36,7 +36,7 @@ export const loadSearchResult = async function (food) {
     state.search.results = recipesArray.map(rec => {
       return {
         Image: rec.image_url,
-        id: rec.recipe_id,
+        id: rec.id,
         title: rec.title,
         publisher: rec.publisher,
       };
