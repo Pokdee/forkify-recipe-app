@@ -6,15 +6,24 @@ import SearchView from './searchView.js';
 import ResultView from './resultView.js';
 import RecipeView from './recipeView.js';
 import PaginationView from './paginationView.js';
+
 const showRecipe = async function () {
   try {
-    const id = window.location.hash; //'#5ed6604591c37cdc054bc886';
+    ///take id
+    const id = window.location.hash;
     if (!id) return;
+
+    ////Add spinner
     RecipeView.spinner();
 
+    ////load Results
     await model.Loadrecipe(id);
     const { recipe } = model.state;
 
+    /////Reload preview result
+    ResultView.update(model.sortResults());
+
+    //////Render result
     RecipeView.render(recipe);
   } catch (err) {
     console.log(err);
@@ -24,7 +33,7 @@ const showRecipe = async function () {
 
 ///////////////
 let resultPageLen;
-const loadRecipe = async function () {
+const loadSearchRecipe = async function () {
   try {
     //clean container
 
@@ -70,9 +79,7 @@ const servingController = function (serving) {
 const init = function () {
   RecipeView.addHandlerRender(showRecipe);
   RecipeView.addHandlerServing(servingController);
-  RecipeView.addHandlerRecipe(showRecipe);
-
-  SearchView.addHandlerSearch(loadRecipe);
+  SearchView.addHandlerSearch(loadSearchRecipe);
   PaginationView.addHandlerPagi(pagiController);
 };
 init();

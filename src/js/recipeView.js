@@ -1,4 +1,5 @@
 import View from './view.js';
+
 class RecipeView extends View {
   // _previewContainer = document.querySelector('.results');
   _parentElement = document.querySelector('.recipe');
@@ -7,15 +8,6 @@ class RecipeView extends View {
 
   _data = {};
 
-  addHandlerRecipe(handler) {
-    this._parentElement.addEventListener('click', e => {
-      // e.preventDefault();
-      if (!e.target.closest('.preview')) return;
-      const parent = e.target.closest('.preview');
-      const id = parent.querySelector('.preview__link').getAttribute('href');
-      handler(id);
-    });
-  }
   addHandlerServing(handler) {
     this._parentElement.addEventListener('click', e => {
       const btn = e.target.closest('.btn--tiny');
@@ -111,26 +103,7 @@ class RecipeView extends View {
           
           `;
   }
-  _updateIngredients() {
-    const html = this._data
-      .map(int => {
-        return `
-        <li class="recipe__ingredient">
-        <svg class="recipe__icon">
-          <use href="src/img/icons.svg#icon-check"></use>
-        </svg>
-        <div class="recipe__quantity">${
-          typeof int.quantity === 'number' ? int.quantity : ''
-        }</div>
-        <div class="recipe__description">
-          <span class="recipe__unit">${int.unit}</span>
-          ${int.description}
-        </div>
-        </li>
-        `;
-      })
-      .join('');
-  }
+
   _renderIngredients(obj) {
     const html = obj.ingredients
       .map(int => {
@@ -140,7 +113,9 @@ class RecipeView extends View {
           <use href="src/img/icons.svg#icon-check"></use>
         </svg>
         <div class="recipe__quantity">${
-          typeof int.quantity === 'number' ? int.quantity : ''
+          typeof int.quantity !== 'number' || int.quantity === 0
+            ? ''
+            : int.quantity.toFixed(1)
         }</div>
         <div class="recipe__description">
           <span class="recipe__unit">${int.unit}</span>

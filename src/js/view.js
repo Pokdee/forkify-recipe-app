@@ -18,6 +18,7 @@ export default class View {
     const newDom = document.createRange().createContextualFragment(html);
     const newEl = newDom.querySelectorAll('*');
     const oldEl = this._parentElement.querySelectorAll('*');
+
     newEl.forEach((n, i) => {
       const curNode = oldEl[i];
       if (
