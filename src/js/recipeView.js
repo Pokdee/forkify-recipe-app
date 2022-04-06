@@ -3,8 +3,6 @@ import View from './view.js';
 class RecipeView extends View {
   // _previewContainer = document.querySelector('.results');
   _parentElement = document.querySelector('.recipe');
-  _recipeContainer = document.querySelector('.recipe__ingredient-list');
-  _btnContainer = document.querySelector('.recipe__info-buttons');
 
   _data = {};
 
@@ -19,6 +17,15 @@ class RecipeView extends View {
   //publisher
   addHandlerRender(handler) {
     ['load', 'hashchange'].forEach(ev => window.addEventListener(ev, handler));
+  }
+
+  addHandlerBookmark(handler) {
+    this._parentElement.addEventListener('click', e => {
+      if (e.target.closest('.btn--bookmark')) {
+        const id = window.location.hash;
+        handler(id);
+      }
+    });
   }
 
   _generateHtml(obj = this._data) {
@@ -66,9 +73,11 @@ class RecipeView extends View {
           <div class="recipe__user-generated">
 
             </div>
-            <button class="btn--round">
+            <button class="btn--round btn--bookmark">
               <svg class="">
-                <use href="src/img/icons.svg#icon-bookmark-fill"></use>
+                <use href="src/img/icons.svg#icon-bookmark${
+                  obj.bookmark ? '-fill' : ''
+                }"></use>
               </svg>
             </button>
           </div>

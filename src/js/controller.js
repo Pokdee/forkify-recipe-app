@@ -6,6 +6,7 @@ import SearchView from './searchView.js';
 import ResultView from './resultView.js';
 import RecipeView from './recipeView.js';
 import PaginationView from './paginationView.js';
+import BookmarkView from './bookmarkView.js';
 
 const showRecipe = async function () {
   try {
@@ -75,11 +76,35 @@ const servingController = function (serving) {
   RecipeView.update(model.state.recipe);
 };
 
+const bookmarkadder = async function (recipeid) {
+  const id = recipeid.slice(1);
+  if (model.state.bookmarksid.includes(id)) return;
+  model.storeBookmark(id);
+
+  await model.loadBookmarks(id);
+
+  RecipeView.update(model.state.recipe);
+  bookmarkrender();
+};
+const bookmarkrender = function () {
+  // BookmarkView.update(model.state.bookmarkrecipes);
+  BookmarkView.render(model.state.bookmarkrecipes);
+};
+const bookmarkloader = async function () {
+  model.state.bookmarksid.forEach(async function (id) {
+    await model.loadBookmarks(id);
+    BookmarkView.render(model.state.bookmarkrecipes);
+  });
+};
+bookmarkloader();
+
 //subscriber
 const init = function () {
   RecipeView.addHandlerRender(showRecipe);
   RecipeView.addHandlerServing(servingController);
+  RecipeView.addHandlerBookmark(bookmarkadder);
   SearchView.addHandlerSearch(loadSearchRecipe);
   PaginationView.addHandlerPagi(pagiController);
 };
 init();
+// console.log(model.state.bookmarksid);

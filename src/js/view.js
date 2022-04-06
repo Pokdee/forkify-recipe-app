@@ -18,7 +18,6 @@ export default class View {
     const newDom = document.createRange().createContextualFragment(html);
     const newEl = newDom.querySelectorAll('*');
     const oldEl = this._parentElement.querySelectorAll('*');
-
     newEl.forEach((n, i) => {
       const curNode = oldEl[i];
       if (
@@ -26,6 +25,17 @@ export default class View {
         curNode.firstChild?.nodeValue.trim() !== ''
       ) {
         oldEl[i].textContent = newEl[i].textContent;
+      }
+    });
+    newEl.forEach((n, i) => {
+      const curNode = oldEl[i];
+      if (
+        !n.isEqualNode(curNode) &&
+        curNode.firstChild?.nodeValue.trim() !== ''
+      ) {
+        Array.from(newEl[i].attributes).forEach(attr => {
+          oldEl[i].setAttribute(attr.name, attr.value);
+        });
       }
     });
   }

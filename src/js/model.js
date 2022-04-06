@@ -1,5 +1,6 @@
 import { API_URL, API_URL_NS, RES_PER_PAGE } from './config.js';
 import { fetcher } from './helper.js';
+const storedbookmark = JSON.parse(localStorage.getItem('Bookmarks'));
 
 export const state = {
   recipe: {},
@@ -8,6 +9,8 @@ export const state = {
     results: [],
     page: 1,
   },
+  bookmarksid: storedbookmark ? storedbookmark : [],
+  bookmarkrecipes: [],
 };
 export const Loadrecipe = async function (id) {
   try {
@@ -23,6 +26,9 @@ export const Loadrecipe = async function (id) {
       cookingTime: recipe.cooking_time,
       ingredients: recipe.ingredients,
     };
+    if (state.bookmarksid.includes(state.recipe.id)) {
+      state.recipe.bookmark = true;
+    }
   } catch (error) {
     throw new Error(error.message);
   }
@@ -60,4 +66,26 @@ export const updateServing = function (newServing) {
     ing.quantity = (ing.quantity * newServing) / state.recipe.serving; //ingQt * newSv/OldSv
   });
   state.recipe.serving = newServing;
+};
+
+export const storeBookmark = function (recipeid) {
+  state.bookmarksid.push(recipeid);
+  if (recipeid === state.recipe.id) state.recipe.bookmark = true;
+  localStorage.setItem('Bookmarks', JSON.stringify(state.bookmarksid));
+};
+
+export const loadBookmarks = async function (id) {
+  try {
+    const data = await fetcher(`${API_URL}${id}`);
+    let { recipe } = data.data;
+    recipe = {
+      id: recipe.id,
+      Image: recipe.image_url,
+      title: recipe.title,
+      publisher: recipe.publisher,
+    };
+    state.bookmarkrecipes.push(recipe);
+  } catch (error) {
+    throw error;
+  }
 };
