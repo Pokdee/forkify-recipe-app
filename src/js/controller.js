@@ -8,6 +8,18 @@ import RecipeView from './recipeView.js';
 import PaginationView from './paginationView.js';
 import BookmarkView from './bookmarkView.js';
 
+const bookmarkloader = async function (array) {
+  try {
+    array.forEach(async function (id) {
+      await model.loadBookmarks(id);
+      BookmarkView.render(model.state.bookmarkrecipes);
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
+bookmarkloader(model.state.bookmarksid);
+/////////////////////////
 const showRecipe = async function () {
   try {
     ///take id
@@ -76,35 +88,65 @@ const servingController = function (serving) {
   RecipeView.update(model.state.recipe);
 };
 
-const bookmarkadder = async function (recipeid) {
-  const id = recipeid.slice(1);
-  if (model.state.bookmarksid.includes(id)) return;
-  model.storeBookmark(id);
+const bookmarkController = async function (recipeid) {
+  try {
+    const id = recipeid.slice(1);
 
-  await model.loadBookmarks(id);
+    /////remove Bookmark/////
+    if (model.state.bookmarksid.includes(id)) {
+      ///remove id from bookmark id
+      model.state.bookmarksid = model.state.bookmarksid.filter(
+        hash => hash !== id
+      );
+      //remove id from bookmark recipe
+      model.state.bookmarkrecipes = model.state.bookmarkrecipes.filter(
+        recipe => recipe.id !== id
+      );
 
-  RecipeView.update(model.state.recipe);
-  bookmarkrender();
+      ///save in storage
+      localStorage.setItem(
+        'Bookmarks',
+        JSON.stringify(model.state.bookmarksid)
+      );
+      ///change id's recipe bookmark to false
+      model.removeBookmark(id);
+
+      ////update bookmark btn view
+      RecipeView.update(model.state.recipe);
+
+      if (model.state.bookmarksid.length === 0) {
+        BookmarkView.renderEmptyBookmark();
+        return;
+      }
+
+      ///reload bookmarked recipe
+      bookmarkloader(model.state.bookmarksid);
+      return;
+    }
+    ///Store bookmark////
+
+    if (!model.state.bookmarksid.includes(id)) {
+      model.storeBookmark(id);
+
+      await model.loadBookmarks(id);
+
+      RecipeView.update(model.state.recipe);
+
+      BookmarkView.render(model.state.bookmarkrecipes);
+    }
+  } catch (error) {
+    console.log(error);
+  }
 };
-const bookmarkrender = function () {
-  // BookmarkView.update(model.state.bookmarkrecipes);
-  BookmarkView.render(model.state.bookmarkrecipes);
-};
-const bookmarkloader = async function () {
-  model.state.bookmarksid.forEach(async function (id) {
-    await model.loadBookmarks(id);
-    BookmarkView.render(model.state.bookmarkrecipes);
-  });
-};
-bookmarkloader();
 
 //subscriber
 const init = function () {
   RecipeView.addHandlerRender(showRecipe);
   RecipeView.addHandlerServing(servingController);
-  RecipeView.addHandlerBookmark(bookmarkadder);
+  RecipeView.addHandlerBookmark(bookmarkController);
   SearchView.addHandlerSearch(loadSearchRecipe);
   PaginationView.addHandlerPagi(pagiController);
 };
 init();
+// localStorage.clear();
 // console.log(model.state.bookmarksid);

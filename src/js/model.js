@@ -73,9 +73,14 @@ export const storeBookmark = function (recipeid) {
   if (recipeid === state.recipe.id) state.recipe.bookmark = true;
   localStorage.setItem('Bookmarks', JSON.stringify(state.bookmarksid));
 };
+export const removeBookmark = function (recipeid) {
+  if (recipeid === state.recipe.id) state.recipe.bookmark = false;
+};
 
 export const loadBookmarks = async function (id) {
   try {
+    if (state.bookmarkrecipes.some(recipe => recipe.id === id)) return;
+
     const data = await fetcher(`${API_URL}${id}`);
     let { recipe } = data.data;
     recipe = {
