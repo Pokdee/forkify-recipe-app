@@ -6,19 +6,9 @@ import SearchView from './searchView.js';
 import ResultView from './resultView.js';
 import RecipeView from './recipeView.js';
 import PaginationView from './paginationView.js';
-import BookmarkView from './bookmarkView.js';
+import bookmarkView from './bookmarkView.js';
+import PreviewView from './previewView.js';
 
-const bookmarkloader = async function (array) {
-  try {
-    array.forEach(async function (id) {
-      await model.loadBookmarks(id);
-      BookmarkView.render(model.state.bookmarkrecipes);
-    });
-  } catch (error) {
-    console.log(error);
-  }
-};
-bookmarkloader(model.state.bookmarksid);
 /////////////////////////
 const showRecipe = async function () {
   try {
@@ -38,6 +28,7 @@ const showRecipe = async function () {
 
     //////Render result
     RecipeView.render(recipe);
+    bookmarkView.update(model.state.bookmarked);
   } catch (err) {
     console.log(err);
     RecipeView.renderError();
@@ -88,57 +79,22 @@ const servingController = function (serving) {
   RecipeView.update(model.state.recipe);
 };
 
-const bookmarkController = async function (recipeid) {
-  try {
-    const id = recipeid.slice(1);
-
-    /////remove Bookmark/////
-    if (model.state.bookmarksid.includes(id)) {
-      ///remove id from bookmark id
-      model.state.bookmarksid = model.state.bookmarksid.filter(
-        hash => hash !== id
-      );
-      //remove id from bookmark recipe
-      model.state.bookmarkrecipes = model.state.bookmarkrecipes.filter(
-        recipe => recipe.id !== id
-      );
-
-      ///save in storage
-      localStorage.setItem(
-        'Bookmarks',
-        JSON.stringify(model.state.bookmarksid)
-      );
-      ///change id's recipe bookmark to false
-      model.removeBookmark(id);
-
-      ////update bookmark btn view
-      RecipeView.update(model.state.recipe);
-
-      if (model.state.bookmarksid.length === 0) {
-        BookmarkView.renderEmptyBookmark();
-        return;
-      }
-
-      ///reload bookmarked recipe
-      bookmarkloader(model.state.bookmarksid);
-      return;
+const bookmarkController = function (id) {
+  if (model.state.recipe.bookmark) {
+    model.deleteBookmark(id);
+    RecipeView.update(model.state.recipe);
+    if (model.state.bookmarked.length === 0) {
+      bookmarkView.renderEmptyBookmark();
     }
-    ///Store bookmark////
-
-    if (!model.state.bookmarksid.includes(id)) {
-      model.storeBookmark(id);
-
-      await model.loadBookmarks(id);
-
-      RecipeView.update(model.state.recipe);
-
-      BookmarkView.render(model.state.bookmarkrecipes);
-    }
-  } catch (error) {
-    console.log(error);
+    bookmarkView.render(model.state.bookmarked);
+    return;
   }
+  //add bookmark
+  model.addBookmark(id);
+  //update recipeview
+  RecipeView.update(model.state.recipe);
+  bookmarkView.render(model.state.bookmarked);
 };
-
 //subscriber
 const init = function () {
   RecipeView.addHandlerRender(showRecipe);
@@ -148,5 +104,4 @@ const init = function () {
   PaginationView.addHandlerPagi(pagiController);
 };
 init();
-// localStorage.clear();
-// console.log(model.state.bookmarksid);
+localStorage.clear();

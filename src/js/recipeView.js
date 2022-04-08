@@ -22,7 +22,7 @@ class RecipeView extends View {
   addHandlerBookmark(handler) {
     this._parentElement.addEventListener('click', e => {
       if (e.target.closest('.btn--bookmark')) {
-        const id = window.location.hash;
+        const id = window.location.hash.slice(1);
         handler(id);
       }
     });

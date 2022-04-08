@@ -3,16 +3,20 @@ export default class View {
   _successMessage = 'Click the recipe you want to view';
   _data;
 
-  render(data) {
+  render(data, render = true) {
     if (!data || data.length === 0) return this.renderError;
     this._data = data;
     const html = this._generateHtml();
+    if (!render) {
+      return html;
+    }
     this._cleaner();
     this._parentElement.insertAdjacentHTML('beforeend', html);
   }
 
   update(data) {
     if (!data || data.length === 0) return this.renderError;
+
     this._data = data;
     const html = this._generateHtml();
     const newDom = document.createRange().createContextualFragment(html);
@@ -36,6 +40,15 @@ export default class View {
         Array.from(newEl[i].attributes).forEach(attr => {
           oldEl[i].setAttribute(attr.name, attr.value);
         });
+      }
+    });
+    newEl.forEach((n, i) => {
+      const curNode = oldEl[i];
+      if (
+        !n.isEqualNode(curNode) &&
+        oldEl[i].classList.contains('preview__link')
+      ) {
+        oldEl[i].classList = newEl[i].classList;
       }
     });
   }

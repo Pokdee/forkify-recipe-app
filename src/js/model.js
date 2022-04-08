@@ -1,6 +1,5 @@
 import { API_URL, API_URL_NS, RES_PER_PAGE } from './config.js';
 import { fetcher } from './helper.js';
-const storedbookmark = JSON.parse(localStorage.getItem('Bookmarks'));
 
 export const state = {
   recipe: {},
@@ -9,8 +8,7 @@ export const state = {
     results: [],
     page: 1,
   },
-  bookmarksid: storedbookmark ? storedbookmark : [],
-  bookmarkrecipes: [],
+  bookmarked: [],
 };
 export const Loadrecipe = async function (id) {
   try {
@@ -26,8 +24,10 @@ export const Loadrecipe = async function (id) {
       cookingTime: recipe.cooking_time,
       ingredients: recipe.ingredients,
     };
-    if (state.bookmarksid.includes(state.recipe.id)) {
+    if (state.bookmarked.some(recipe => recipe.id === state.recipe.id)) {
       state.recipe.bookmark = true;
+    } else {
+      state.recipe.bookmark = false;
     }
   } catch (error) {
     throw new Error(error.message);
@@ -68,29 +68,19 @@ export const updateServing = function (newServing) {
   state.recipe.serving = newServing;
 };
 
-export const storeBookmark = function (recipeid) {
-  state.bookmarksid.push(recipeid);
-  if (recipeid === state.recipe.id) state.recipe.bookmark = true;
-  localStorage.setItem('Bookmarks', JSON.stringify(state.bookmarksid));
-};
-export const removeBookmark = function (recipeid) {
-  if (recipeid === state.recipe.id) state.recipe.bookmark = false;
+export const addBookmark = function (id) {
+  ///mark bookmark
+  if (state.recipe.id === id) state.recipe.bookmark = true;
+
+  ////add to bookmarked array
+  state.bookmarked.push(state.recipe);
 };
 
-export const loadBookmarks = async function (id) {
-  try {
-    if (state.bookmarkrecipes.some(recipe => recipe.id === id)) return;
+export const deleteBookmark = function (id) {
+  //get index
+  const index = state.bookmarked.findIndex(rec => rec.id === id);
 
-    const data = await fetcher(`${API_URL}${id}`);
-    let { recipe } = data.data;
-    recipe = {
-      id: recipe.id,
-      Image: recipe.image_url,
-      title: recipe.title,
-      publisher: recipe.publisher,
-    };
-    state.bookmarkrecipes.push(recipe);
-  } catch (error) {
-    throw error;
-  }
+  //remove and unbook
+  state.bookmarked.splice(index, 1);
+  state.recipe.bookmark = false;
 };
