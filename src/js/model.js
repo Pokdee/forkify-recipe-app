@@ -1,5 +1,6 @@
 import { API_URL, API_URL_NS, RES_PER_PAGE } from './config.js';
 import { fetcher } from './helper.js';
+const storage = JSON.parse(localStorage.getItem('bookmarks'));
 
 export const state = {
   recipe: {},
@@ -8,7 +9,7 @@ export const state = {
     results: [],
     page: 1,
   },
-  bookmarked: [],
+  bookmarked: storage ? storage : [],
 };
 export const Loadrecipe = async function (id) {
   try {
@@ -68,12 +69,17 @@ export const updateServing = function (newServing) {
   state.recipe.serving = newServing;
 };
 
+export const storeBookmark = function () {
+  localStorage.setItem('bookmarks', JSON.stringify(state.bookmarked));
+};
+
 export const addBookmark = function (id) {
   ///mark bookmark
   if (state.recipe.id === id) state.recipe.bookmark = true;
 
   ////add to bookmarked array
   state.bookmarked.push(state.recipe);
+  storeBookmark();
 };
 
 export const deleteBookmark = function (id) {
@@ -83,4 +89,5 @@ export const deleteBookmark = function (id) {
   //remove and unbook
   state.bookmarked.splice(index, 1);
   state.recipe.bookmark = false;
+  storeBookmark();
 };

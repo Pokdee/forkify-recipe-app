@@ -25,6 +25,7 @@ const showRecipe = async function () {
 
     /////Reload preview result
     ResultView.update(model.sortResults());
+    bookmarkView.render(model.state.bookmarked);
 
     //////Render result
     RecipeView.render(recipe);
@@ -104,4 +105,3 @@ const init = function () {
   PaginationView.addHandlerPagi(pagiController);
 };
 init();
-localStorage.clear();
