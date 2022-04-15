@@ -1,4 +1,4 @@
-//use it to stop fetcher when network is too
+//use it to stop getJson when network is too
 import { TIME } from './config.js';
 
 const timeout = function (s) {
@@ -9,13 +9,27 @@ const timeout = function (s) {
   });
 };
 
-export const fetcher = async function (url) {
-  const req = await fetch(url);
-  //   const data = await req.json();
-  const data = await Promise.race([req.json(), timeout(TIME)]);
+export const ajaxCall = async function (url, recipe) {
+  try {
+    const req = recipe
+      ? await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-type': 'application/json',
+          },
+          body: JSON.stringify(recipe),
+        })
+      : await fetch(url);
+    const data = await Promise.race([req.json(), timeout(TIME)]);
 
-  if (!req.ok) {
-    throw new Error(`Error from helper`);
+    if (!req.ok) {
+      console.log(data);
+      throw new Error(data.message);
+    }
+
+    return data;
+  } catch (error) {
+    // console.log(error);
+    throw error.message;
   }
-  return data;
 };

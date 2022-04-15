@@ -6,8 +6,10 @@ import SearchView from './searchView.js';
 import ResultView from './resultView.js';
 import RecipeView from './recipeView.js';
 import PaginationView from './paginationView.js';
+import BookmarkView from './bookmarkView.js';
+import addRecipeView from './addRecipeView.js';
+import { MODAL_TIMEOUT } from './config.js';
 import bookmarkView from './bookmarkView.js';
-import PreviewView from './previewView.js';
 
 /////////////////////////
 const showRecipe = async function () {
@@ -25,19 +27,17 @@ const showRecipe = async function () {
 
     /////Reload preview result
     ResultView.update(model.sortResults());
-    bookmarkView.render(model.state.bookmarked);
+    BookmarkView.render(model.state.bookmarked);
 
     //////Render result
     RecipeView.render(recipe);
-    bookmarkView.update(model.state.bookmarked);
+    BookmarkView.update(model.state.bookmarked);
   } catch (err) {
-    console.log(err);
     RecipeView.renderError();
   }
 };
 
 ///////////////
-let resultPageLen;
 const loadSearchRecipe = async function () {
   try {
     //clean container
@@ -62,8 +62,6 @@ const loadSearchRecipe = async function () {
     //render Pagination
     PaginationView.render(model.state.search);
   } catch (error) {
-    console.log(error);
-
     ResultView.renderError();
   }
 };
@@ -80,21 +78,51 @@ const servingController = function (serving) {
   RecipeView.update(model.state.recipe);
 };
 
-const bookmarkController = function (id) {
+const bookmarkController = function (recipe) {
   if (model.state.recipe.bookmark) {
-    model.deleteBookmark(id);
+    model.deleteBookmark(recipe);
     RecipeView.update(model.state.recipe);
     if (model.state.bookmarked.length === 0) {
-      bookmarkView.renderEmptyBookmark();
+      BookmarkView.renderEmptyBookmark();
     }
-    bookmarkView.render(model.state.bookmarked);
+    BookmarkView.render(model.state.bookmarked);
     return;
   }
   //add bookmark
-  model.addBookmark(id);
+  model.addBookmark(recipe);
   //update recipeview
   RecipeView.update(model.state.recipe);
-  bookmarkView.render(model.state.bookmarked);
+  BookmarkView.render(model.state.bookmarked);
+};
+
+const formRender = function () {
+  setTimeout(() => {
+    addRecipeView.renderFormhtml();
+  }, MODAL_TIMEOUT + 2 * 1000);
+};
+const controllUpload = async function (data) {
+  try {
+    await model.recipeUpload(data);
+    addRecipeView.renderSuccess();
+
+    setTimeout(() => {
+      addRecipeView.mangeWindow();
+    }, MODAL_TIMEOUT * 1000);
+    formRender();
+    RecipeView.render(model.state.recipe);
+    bookmarkView.render(model.state.bookmarked);
+    await model.Loadrecipe(`#${model.state.recipe.id}`);
+
+    RecipeView.update(model.state.recipe);
+
+    //update url with history api
+    history.pushState(null, null, `#${model.state.recipe.id}`);
+  } catch (error) {
+    addRecipeView.renderError(error);
+    setTimeout(() => {
+      addRecipeView.renderFormhtml();
+    }, MODAL_TIMEOUT + 2000);
+  }
 };
 //subscriber
 const init = function () {
@@ -103,5 +131,6 @@ const init = function () {
   RecipeView.addHandlerBookmark(bookmarkController);
   SearchView.addHandlerSearch(loadSearchRecipe);
   PaginationView.addHandlerPagi(pagiController);
+  addRecipeView.addHandlerUpload(controllUpload);
 };
 init();

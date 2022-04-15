@@ -832,6 +832,7 @@ body {
   border-radius: 10rem;
   margin-left: auto;
   margin-right: 1.75rem;
+  /* background-color: #f9f5f3; */
 }
 
 .recipe__user-generated svg {
