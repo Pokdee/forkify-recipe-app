@@ -29,11 +29,14 @@ class PaginationView extends View {
           <use href="src/img/icons.svg#icon-arrow-right"></use>
          </svg>
         </button>
+        <div class="pagination__pages">${curPage} of ${pageNum}</div>
         `;
     }
     //ON last page
     if (curPage === pageNum) {
       return `
+      <div class="pagination__pages">${curPage} of ${pageNum}</div>
+
         <button data-goto = "${
           curPage - 1
         }" class="btn--inline pagination__btn--prev">
@@ -55,6 +58,8 @@ class PaginationView extends View {
             </svg>
             <span>Page ${curPage - 1}</span>
         </button>
+        <div class="pagination__pages">${curPage} of ${pageNum}</div>
+
         <button data-goto = "${
           curPage + 1
         }" class="btn--inline pagination__btn--next">
